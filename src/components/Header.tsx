@@ -86,7 +86,8 @@ export default function Header() {
       id="header"
       className={cn(
         "sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ease-in-out",
-        "h-[var(--header-height)]"
+        "h-[var(--header-height)]",
+        isShrunk && "shrink"
       )}
     >
       <div className="container flex h-full max-w-screen-2xl items-center justify-between">
