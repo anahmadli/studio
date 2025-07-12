@@ -21,12 +21,62 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
-            <path d="M2 21h20" />
-            <path d="M4 21V11a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10" />
-            <path d="M12 11V7" />
-            <path d="M12 3l-2 2" />
-            <path d="M12 3l2 2" />
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 200 200"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8"
+          >
+            <defs>
+              <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{stopColor: 'hsl(var(--primary))', stopOpacity: 1}} />
+                <stop offset="100%" style={{stopColor: 'hsl(var(--accent))', stopOpacity: 1}} />
+              </linearGradient>
+            </defs>
+            <path
+              fill="hsl(var(--primary))"
+              d="M100 0C72.386 0 50 22.386 50 50c0 14.897 6.503 28.23 16.965 37.125L62.5 87.5h75l-4.465-.375C143.497 78.23 150 64.897 150 50 150 22.386 127.614 0 100 0zm0 25c13.807 0 25 11.193 25 25s-11.193 25-25 25-25-11.193-25-25 11.193-25 25-25z"
+            />
+            <path
+              fill="hsl(var(--primary))"
+              stroke="hsl(var(--accent))"
+              strokeWidth="10"
+              d="M30 87.5V180a5 5 0 005 5h130a5 5 0 005-5V87.5H30z"
+            />
+            <path
+              fill="none"
+              stroke="hsl(var(--accent))"
+              strokeWidth="10"
+              strokeLinejoin="round"
+              d="M45 102.5h110v65H45z"
+            />
+            <path
+              fill="hsl(var(--accent))"
+              d="M80 167.5a10 10 0 10-20 0 10 10 0 0020 0zM100 167.5a10 10 0 10-20 0 10 10 0 0020 0zM120 167.5a10 10 0 10-20 0 10 10 0 0020 0zM140 167.5a10 10 0 10-20 0 10 10 0 0020 0z"
+            />
+            <path
+              fill="hsl(var(--accent))"
+              d="M70 125a5 5 0 10-10 0 5 5 0 0010 0zM90 125a5 5 0 10-10 0 5 5 0 0010 0zM110 125a5 5 0 10-10 0 5 5 0 0010 0zM130 125a5 5 0 10-10 0 5 5 0 0010 0zM150 125a5 5 0 10-10 0 5 5 0 0010 0z"
+            />
+            <path
+              fill="hsl(var(--accent))"
+              d="M70 145a5 5 0 10-10 0 5 5 0 0010 0zM90 145a5 5 0 10-10 0 5 5 0 0010 0zM110 145a5 5 0 10-10 0 5 5 0 0010 0zM130 145a5 5 0 10-10 0 5 5 0 0010 0zM150 145a5 5 0 10-10 0 5 5 0 0010 0z"
+            />
+            <path
+              fill="none"
+              stroke="hsl(var(--accent))"
+              strokeWidth="10"
+              d="M100 102.5c-20 0-20 20-20 20s0-20 20-20z"
+              transform="rotate(180 100 122.5)"
+            />
+            <path
+              fill="hsl(var(--accent))"
+              d="M30 190h140v10H30z"
+            >
+              <animate attributeName="x" from="30" to="25" dur="1s" repeatCount="indefinite" />
+            </path>
+            <path d="M40 185 L40 195 M55 185 L55 195 M70 185 L70 195 M85 185 L85 195 M100 185 L100 195 M115 185 L115 195 M130 185 L130 195 M145 185 L145 195 M160 185 L160 195" stroke="hsl(var(--accent))" strokeWidth="4"/>
           </svg>
           <span className="font-headline text-xl font-bold tracking-tight">
             MyMasjid
