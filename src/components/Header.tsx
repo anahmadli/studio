@@ -29,7 +29,7 @@ export default function Header() {
             <path d="M12 3l2 2" />
           </svg>
           <span className="font-headline text-xl font-bold tracking-tight">
-            Salaat Spotter
+            MyMasjid
           </span>
         </Link>
         
