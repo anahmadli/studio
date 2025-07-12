@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'MyMasjid',
+  title: 'Salaat Spotter',
   description: 'Find masjids and home prayer spaces near you.',
 };
 
