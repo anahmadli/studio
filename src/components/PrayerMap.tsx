@@ -1,9 +1,12 @@
 "use client";
 
 import React from 'react';
-import { APIProvider, Map, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
-import { type PrayerSpace, type GeolocationPosition } from '@/lib/types';
+import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow } from '@vis.gl/react-google-maps';
 import { Skeleton } from './ui/skeleton';
+import { type PrayerSpace } from '@/lib/types';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Home, Users } from 'lucide-react';
 
 const MasjidIcon = () => (
   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md border-2 border-white">
@@ -30,19 +33,27 @@ const mockPrayerSpaces: PrayerSpace[] = [
 
 interface PrayerMapProps {
   filters: { masjid: boolean; home: boolean };
-  userPosition: GeolocationPosition | null;
+  userPosition: {lat: number, lng: number} | null;
   loadingLocation: boolean;
 }
 
 export default function PrayerMap({ filters, userPosition, loadingLocation }: PrayerMapProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const [selectedSpace, setSelectedSpace] = React.useState<PrayerSpace | null>(null);
 
-  if (!apiKey) {
-    return <div className="flex items-center justify-center h-full bg-muted">Error: Google Maps API key is missing.</div>;
-  }
-  
   if (loadingLocation) {
     return <Skeleton className="h-full w-full" />;
+  }
+
+  if (!apiKey) {
+    return (
+      <div className="flex items-center justify-center h-full bg-muted">
+        <div className="text-center p-4">
+          <p className="font-bold text-destructive">Error: Google Maps API key is missing.</p>
+          <p className="text-sm text-muted-foreground">Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your environment variables.</p>
+        </div>
+      </div>
+    );
   }
 
   const filteredSpaces = mockPrayerSpaces.filter(space => {
@@ -52,7 +63,7 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
   });
 
   return (
-    <APIProvider apiKey={apiKey}>
+    <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API loaded.')}>
       <Map
         defaultCenter={{ lat: 34.0522, lng: -118.2437 }}
         center={userPosition || undefined}
@@ -61,9 +72,15 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
         disableDefaultUI={true}
         mapId="salaat_spotter_map"
         className="h-full w-full"
+        onCameraChanged={(ev) => console.log(ev)}
       >
         {filteredSpaces.map((space) => (
-          <AdvancedMarker key={space.id} position={space.position} title={space.name}>
+          <AdvancedMarker 
+            key={space.id} 
+            position={space.position} 
+            title={space.name}
+            onClick={() => setSelectedSpace(space)}
+          >
              {space.type === 'masjid' ? <MasjidIcon /> : <HomeIcon />}
           </AdvancedMarker>
         ))}
@@ -72,6 +89,42 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
           <AdvancedMarker position={userPosition} title="Your Location">
             <Pin background={'#45A0A2'} borderColor={'#fff'} glyphColor={'#fff'} />
           </AdvancedMarker>
+        )}
+
+        {selectedSpace && (
+          <InfoWindow 
+            position={selectedSpace.position} 
+            onCloseClick={() => setSelectedSpace(null)}
+            pixelOffset={[0, -40]}
+          >
+            <Card className="max-w-xs border-none shadow-none">
+              <CardHeader className="p-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  {selectedSpace.type === 'masjid' ? <MasjidIcon /> : <HomeIcon />}
+                  {selectedSpace.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-2 space-y-2">
+                {selectedSpace.type === 'home' && (
+                  <div className='flex items-center text-sm text-muted-foreground gap-4'>
+                    <div className='flex items-center gap-1.5'>
+                      <Users className="h-4 w-4" />
+                      <span>Capacity: {selectedSpace.capacity}</span>
+                    </div>
+                    <div className='flex items-center gap-1.5'>
+                      <Home className="h-4 w-4" />
+                      <span>{selectedSpace.hours}</span>
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  {selectedSpace.amenities.map(amenity => (
+                    <Badge key={amenity} variant="secondary">{amenity}</Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </InfoWindow>
         )}
       </Map>
     </APIProvider>
