@@ -10,12 +10,12 @@ import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { getPrayerMethodId, prayerMethodMap } from '@/lib/prayer-methods';
-import type { GeolocationPosition, PrayerTimesData } from '@/lib/types';
-import { Clock, Compass, Sun, Moon, Sunrise, Sunset, Filter } from 'lucide-react';
+import type { GeolocationPosition, PrayerTimesData, Filters } from '@/lib/types';
+import { Clock, Compass, Sun, Moon, Sunrise, Sunset, Filter, Droplets, User, ParkingCircle, Accessibility, CalendarCheck } from 'lucide-react';
 
 interface PrayerTimesProps {
-  filters: { masjid: boolean; home: boolean };
-  setFilters: React.Dispatch<React.SetStateAction<{ masjid: boolean; home: boolean }>>;
+  filters: Filters;
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   position: GeolocationPosition | null;
   loadingLocation: boolean;
 }
@@ -90,6 +90,10 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
   const handleMethodChange = (value: string) => {
     setSelectedMethod(Number(value));
   };
+  
+  const handleFilterChange = (filterName: keyof Filters, checked: boolean) => {
+    setFilters(f => ({ ...f, [filterName]: checked }));
+  };
 
   const PrayerTimesSkeleton = () => (
     <div className="space-y-4">
@@ -120,6 +124,68 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-headline">
+            <Filter className="h-5 w-5" />
+            Map Filters
+          </CardTitle>
+          <CardDescription>Show or hide locations on the map.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+           <div className="flex items-center justify-between">
+            <Label htmlFor="masjid-filter" className="flex items-center gap-2 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="M2 21h20"/><path d="M4 21V11a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10"/><path d="M12 11V7"/><path d="M12 3l-2 2"/><path d="M12 3l2 2"/></svg>
+              Masjids
+            </Label>
+            <Switch id="masjid-filter" checked={filters.masjid} onCheckedChange={(checked) => handleFilterChange('masjid', checked)} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="home-filter" className="flex items-center gap-2 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Homes
+            </Label>
+            <Switch id="home-filter" checked={filters.home} onCheckedChange={(checked) => handleFilterChange('home', checked)} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="wudu-filter" className="flex items-center gap-2 cursor-pointer text-sm">
+              <Droplets className="h-4 w-4 text-primary" />
+              Wudu Area
+            </Label>
+            <Switch id="wudu-filter" checked={filters.wudu} onCheckedChange={(checked) => handleFilterChange('wudu', checked)} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="sisters-filter" className="flex items-center gap-2 cursor-pointer text-sm">
+              <User className="h-4 w-4 text-primary" />
+              Sister's Area
+            </Label>
+            <Switch id="sisters-filter" checked={filters.sisters} onCheckedChange={(checked) => handleFilterChange('sisters', checked)} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="parking-filter" className="flex items-center gap-2 cursor-pointer text-sm">
+              <ParkingCircle className="h-4 w-4 text-primary" />
+              Parking
+            </Label>
+            <Switch id="parking-filter" checked={filters.parking} onCheckedChange={(checked) => handleFilterChange('parking', checked)} />
+          </div>
+           <div className="flex items-center justify-between">
+            <Label htmlFor="wheelchair-filter" className="flex items-center gap-2 cursor-pointer text-sm">
+              <Accessibility className="h-4 w-4 text-primary" />
+              Wheelchair Accessible
+            </Label>
+            <Switch id="wheelchair-filter" checked={filters.wheelchair} onCheckedChange={(checked) => handleFilterChange('wheelchair', checked)} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="jummah-filter" className="flex items-center gap-2 cursor-pointer text-sm">
+              <CalendarCheck className="h-4 w-4 text-primary" />
+              Jummah Only
+            </Label>
+            <Switch id="jummah-filter" checked={filters.jummah} onCheckedChange={(checked) => handleFilterChange('jummah', checked)} />
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 font-headline">
             <Clock className="h-5 w-5" />
             Daily Prayer Times
           </CardTitle>
@@ -137,32 +203,6 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
           ) : (
             <p>Could not load prayer times.</p>
           )}
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-headline">
-            <Filter className="h-5 w-5" />
-            Map Filters
-          </CardTitle>
-          <CardDescription>Show or hide locations on the map.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-           <div className="flex items-center justify-between">
-            <Label htmlFor="masjid-filter" className="flex items-center gap-2 cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="M2 21h20"/><path d="M4 21V11a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10"/><path d="M12 11V7"/><path d="M12 3l-2 2"/><path d="M12 3l2 2"/></svg>
-              Masjids
-            </Label>
-            <Switch id="masjid-filter" checked={filters.masjid} onCheckedChange={(checked) => setFilters(f => ({...f, masjid: checked}))} />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="home-filter" className="flex items-center gap-2 cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              Homes
-            </Label>
-            <Switch id="home-filter" checked={filters.home} onCheckedChange={(checked) => setFilters(f => ({...f, home: checked}))} />
-          </div>
         </CardContent>
       </Card>
 

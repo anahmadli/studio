@@ -31,3 +31,13 @@ export interface PrayerTimesData {
   Maghrib: string;
   Isha: string;
 }
+
+export interface Filters {
+  masjid: boolean;
+  home: boolean;
+  wudu: boolean;
+  sisters: boolean;
+  parking: boolean;
+  wheelchair: boolean;
+  jummah: boolean;
+}

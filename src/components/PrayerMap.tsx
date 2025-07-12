@@ -3,7 +3,7 @@
 import React from 'react';
 import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow } from '@vis.gl/react-google-maps';
 import { Skeleton } from './ui/skeleton';
-import { type PrayerSpace } from '@/lib/types';
+import { type PrayerSpace, type Filters } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Home, Users } from 'lucide-react';
@@ -32,7 +32,7 @@ const mockPrayerSpaces: PrayerSpace[] = [
 ];
 
 interface PrayerMapProps {
-  filters: { masjid: boolean; home: boolean };
+  filters: Filters;
   userPosition: {lat: number, lng: number} | null;
   loadingLocation: boolean;
 }
@@ -59,9 +59,21 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
   const defaultCenter = { lat: 39.1434, lng: -77.2014 };
 
   const filteredSpaces = mockPrayerSpaces.filter(space => {
-    if (filters.masjid && space.type === 'masjid') return true;
-    if (filters.home && space.type === 'home') return true;
-    return false;
+    // Type filters
+    if (!filters.masjid && space.type === 'masjid') return false;
+    if (!filters.home && space.type === 'home') return false;
+
+    // Amenity filters
+    if (filters.wudu && !space.amenities.includes('Wudu')) return false;
+    if (filters.sisters && !space.amenities.includes('Sisters Area')) return false;
+    if (filters.parking && !space.amenities.includes('Parking')) return false;
+    if (filters.wheelchair && !space.amenities.includes('Wheelchair Accessible')) return false;
+
+    // Jummah filter (for home spaces)
+    if (filters.jummah && space.type === 'home' && space.hours !== 'Jummah Only') return false;
+    if (filters.jummah && space.type === 'masjid') return true; // Assume masjids have Jummah
+
+    return true;
   });
 
   return (
