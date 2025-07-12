@@ -23,12 +23,12 @@ const HomeIcon = () => (
 
 // Mock data - in a real app, this would come from Firestore
 const mockPrayerSpaces: PrayerSpace[] = [
-  { id: 'm1', type: 'masjid', name: 'Downtown Islamic Center', position: { lat: 34.0522, lng: -118.2437 }, amenities: ['Wudu', 'Parking', 'Wheelchair Accessible'] },
-  { id: 'm2', type: 'masjid', name: 'Masjid Al-Noor', position: { lat: 34.0628, lng: -118.2541 }, amenities: ['Wudu', 'Parking'] },
-  { id: 'h1', type: 'home', name: 'Ali\'s Prayer Space', position: { lat: 34.0450, lng: -118.2550 }, capacity: 5, hours: 'Fajr, Dhuhr, Asr', amenities: ['Wudu'] },
-  { id: 'h2', type: 'home', name: 'Fatima\'s Guest Room', position: { lat: 34.0580, lng: -118.2300 }, capacity: 3, hours: 'All day', amenities: ['Wudu', 'Sisters Area'] },
-  { id: 'm3', type: 'masjid', name: 'Westside Community Mosque', position: { lat: 34.0407, lng: -118.4452 }, amenities: ['Wudu', 'Parking'] },
-  { id: 'h3', type: 'home', name: 'Ibrahim\'s Garage Musalla', position: { lat: 34.0722, lng: -118.4452 }, capacity: 10, hours: 'Jummah Only', amenities: [] },
+  { id: 'm1', type: 'masjid', name: 'Islamic Center of Maryland', position: { lat: 39.1376, lng: -77.1511 }, amenities: ['Wudu', 'Parking', 'Wheelchair Accessible', 'Sisters Area'] },
+  { id: 'm2', type: 'masjid', name: 'Islamic Community Center of Potomac', position: { lat: 39.0911, lng: -77.2458 }, amenities: ['Wudu', 'Parking'] },
+  { id: 'h1', type: 'home', name: 'Ahmed\'s Prayer Space', position: { lat: 39.1550, lng: -77.2050 }, capacity: 8, hours: 'Dhuhr & Asr', amenities: ['Wudu'] },
+  { id: 'h2', type: 'home', name: 'Khadija\'s Guest Room', position: { lat: 39.1280, lng: -77.1800 }, capacity: 4, hours: 'All day', amenities: ['Wudu', 'Sisters Area'] },
+  { id: 'm3', type: 'masjid', name: 'Muslim Community Center', position: { lat: 39.1162, lng: -77.0135 }, amenities: ['Wudu', 'Parking'] },
+  { id: 'h3', type: 'home', name: 'Yusuf\'s Garage Musalla', position: { lat: 39.1422, lng: -77.2352 }, capacity: 12, hours: 'Jummah Only', amenities: ['Parking'] },
 ];
 
 interface PrayerMapProps {
@@ -55,6 +55,8 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
       </div>
     );
   }
+  
+  const defaultCenter = { lat: 39.1434, lng: -77.2014 };
 
   const filteredSpaces = mockPrayerSpaces.filter(space => {
     if (filters.masjid && space.type === 'masjid') return true;
@@ -65,14 +67,13 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
   return (
     <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API loaded.')}>
       <Map
-        defaultCenter={{ lat: 34.0522, lng: -118.2437 }}
-        center={userPosition || undefined}
+        defaultCenter={defaultCenter}
+        center={userPosition || defaultCenter}
         defaultZoom={12}
         gestureHandling={'greedy'}
         disableDefaultUI={true}
         mapId="salaat_spotter_map"
         className="h-full w-full"
-        onCameraChanged={(ev) => console.log(ev)}
       >
         {filteredSpaces.map((space) => (
           <AdvancedMarker 

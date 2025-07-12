@@ -20,13 +20,22 @@ interface PrayerTimesProps {
   loadingLocation: boolean;
 }
 
+const formatTime = (time: string) => {
+  if (!time) return '';
+  const [hour, minute] = time.split(':');
+  const hourNum = parseInt(hour, 10);
+  const ampm = hourNum >= 12 ? 'PM' : 'AM';
+  const formattedHour = hourNum % 12 || 12;
+  return `${formattedHour}:${minute} ${ampm}`;
+};
+
 const PrayerTimeRow = ({ name, time, icon }: { name: string; time: string; icon: React.ReactNode }) => (
   <div className="flex items-center justify-between py-2">
     <div className="flex items-center gap-3">
       {icon}
       <span className="text-muted-foreground">{name}</span>
     </div>
-    <span className="font-mono font-semibold">{time}</span>
+    <span className="font-mono font-semibold">{formatTime(time)}</span>
   </div>
 );
 
@@ -43,7 +52,7 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
       
       const fetchPrayerTimes = async (method: number) => {
         try {
-          const response = await fetch(`https://api.aladhan.com/v1/timings?latitude=${position.lat}&longitude=${position.lng}&method=${method}`);
+          const response = await fetch(`https://api.aladhan.com/v1/timings?latitude=${position.lat}&longitude=${position.lng}&method=${method}&timezonestring=America/New_York`);
           if (!response.ok) throw new Error('Failed to fetch prayer times.');
           const data = await response.json();
           setPrayerTimes(data.data.timings);
@@ -114,7 +123,7 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
             <Clock className="h-5 w-5" />
             Daily Prayer Times
           </CardTitle>
-          <CardDescription>Based on your current location.</CardDescription>
+          <CardDescription>Gaithersburg, MD (EST)</CardDescription>
         </CardHeader>
         <CardContent>
           {loadingLocation || loadingPrayerTimes ? (
@@ -128,6 +137,32 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
           ) : (
             <p>Could not load prayer times.</p>
           )}
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 font-headline">
+            <Filter className="h-5 w-5" />
+            Map Filters
+          </CardTitle>
+          <CardDescription>Show or hide locations on the map.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+           <div className="flex items-center justify-between">
+            <Label htmlFor="masjid-filter" className="flex items-center gap-2 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="M2 21h20"/><path d="M4 21V11a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10"/><path d="M12 11V7"/><path d="M12 3l-2 2"/><path d="M12 3l2 2"/></svg>
+              Masjids
+            </Label>
+            <Switch id="masjid-filter" checked={filters.masjid} onCheckedChange={(checked) => setFilters(f => ({...f, masjid: checked}))} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="home-filter" className="flex items-center gap-2 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              Homes
+            </Label>
+            <Switch id="home-filter" checked={filters.home} onCheckedChange={(checked) => setFilters(f => ({...f, home: checked}))} />
+          </div>
         </CardContent>
       </Card>
 
@@ -163,33 +198,6 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
           </Select>
         </CardContent>
       </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-headline">
-            <Filter className="h-5 w-5" />
-            Map Filters
-          </CardTitle>
-          <CardDescription>Show or hide locations on the map.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-           <div className="flex items-center justify-between">
-            <Label htmlFor="masjid-filter" className="flex items-center gap-2 cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="M2 21h20"/><path d="M4 21V11a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10"/><path d="M12 11V7"/><path d="M12 3l-2 2"/><path d="M12 3l2 2"/></svg>
-              Masjids
-            </Label>
-            <Switch id="masjid-filter" checked={filters.masjid} onCheckedChange={(checked) => setFilters(f => ({...f, masjid: checked}))} />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="home-filter" className="flex items-center gap-2 cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-primary"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              Homes
-            </Label>
-            <Switch id="home-filter" checked={filters.home} onCheckedChange={(checked) => setFilters(f => ({...f, home: checked}))} />
-          </div>
-        </CardContent>
-      </Card>
-
     </div>
   );
 }

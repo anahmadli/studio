@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import PrayerMap from '@/components/PrayerMap';
 import PrayerTimes from '@/components/PrayerTimes';
-import { type PrayerSpace } from '@/lib/types';
-import { useGeolocation } from '@/hooks/use-geolocation';
+import { type GeolocationPosition } from '@/lib/types';
 
 export default function Home() {
   const [filters, setFilters] = useState({ masjid: true, home: true });
-  const { position, loading: loadingLocation } = useGeolocation();
+  // Hardcoded position for Gaithersburg, MD
+  const position: GeolocationPosition = { lat: 39.1434, lng: -77.2014 };
+  const loadingLocation = false;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[380px_1fr] h-[calc(100vh-var(--header-height))]">
