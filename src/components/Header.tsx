@@ -12,12 +12,45 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, LogOut, PlusCircle, User } from 'lucide-react';
+import { LayoutDashboard, LogOut, PlusCircle, User, Clock, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useGeolocation } from '@/hooks/use-geolocation';
+import type { PrayerTimesData } from '@/lib/types';
+
+const formatTime = (time: string) => {
+    if (!time) return '';
+    const [hour, minute] = time.split(':');
+    const hourNum = parseInt(hour, 10);
+    const ampm = hourNum >= 12 ? 'PM' : 'AM';
+    const formattedHour = hourNum % 12 || 12;
+    return `${formattedHour}:${minute} ${ampm}`;
+};
+
+const getNextPrayer = (times: PrayerTimesData) => {
+    if (!times) return null;
+    const now = new Date();
+    const prayerOrder: (keyof PrayerTimesData)[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+    for (const prayerName of prayerOrder) {
+        const prayerTime = new Date();
+        const [hours, minutes] = times[prayerName].split(':').map(Number);
+        prayerTime.setHours(hours, minutes, 0, 0);
+
+        if (prayerTime > now) {
+            return { name: prayerName, time: formatTime(times[prayerName]) };
+        }
+    }
+    // If all prayers for today have passed, show Fajr for tomorrow
+    return { name: "Fajr", time: formatTime(times.Fajr) };
+};
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isShrunk, setIsShrunk] = useState(false);
+  
+  const { position, loading: loadingLocation } = useGeolocation();
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimesData | null>(null);
+  const [loadingPrayerTimes, setLoadingPrayerTimes] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +59,27 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  useEffect(() => {
+    if (position) {
+      setLoadingPrayerTimes(true);
+      const fetchPrayerTimes = async () => {
+        try {
+          const response = await fetch(`https://api.aladhan.com/v1/timings?latitude=${position.lat}&longitude=${position.lng}&method=2&timezonestring=America/New_York`);
+          if (!response.ok) throw new Error('Failed to fetch prayer times.');
+          const data = await response.json();
+          setPrayerTimes(data.data.timings);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setLoadingPrayerTimes(false);
+        }
+      };
+      fetchPrayerTimes();
+    }
+  }, [position]);
+  
+  const nextPrayer = getNextPrayer(prayerTimes!);
 
   return (
     <header 
@@ -88,11 +142,23 @@ export default function Header() {
             <path d="M40 185 L40 195 M55 185 L55 195 M70 185 L70 195 M85 185 L85 195 M100 185 L100 195 M115 185 L115 195 M130 185 L130 195 M145 185 L145 195 M160 185 L160 195" stroke="hsl(26, 40%, 45%)" strokeWidth="4"/>
           </svg>
           <span className="font-headline text-2xl font-bold tracking-tight">
-            Salaat Spotter
+            MyMasjid
           </span>
         </Link>
         
         <div className="flex items-center gap-4">
+           {loadingLocation || loadingPrayerTimes ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Loading prayer times...</span>
+            </div>
+           ) : nextPrayer ? (
+            <div className="hidden sm:flex items-center gap-2 text-sm">
+                <Clock className="h-4 w-4 text-primary" />
+                <span>Next Prayer: <b>{nextPrayer.name}</b> at <b>{nextPrayer.time}</b></span>
+            </div>
+           ) : null}
+
           <Button asChild variant="outline" className="hidden sm:flex">
             <Link href="/add-space">
               <PlusCircle className="mr-2 h-4 w-4" />
