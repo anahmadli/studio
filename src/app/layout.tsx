@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Salaat Spotter',
+  title: 'MyMasjid',
   description: 'Find masjids and home prayer spaces near you.',
 };
 
@@ -24,7 +24,7 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
         <div className="relative flex min-h-screen flex-col">
           <Header />
-          <div className="flex-1">{children}</div>
+          <div className="flex-1 pt-[var(--header-height)]">{children}</div>
         </div>
         <Toaster />
       </body>

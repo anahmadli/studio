@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,66 +13,83 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LayoutDashboard, LogOut, PlusCircle, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isShrunk, setIsShrunk] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsShrunk(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+    <header 
+      id="header"
+      className={cn(
+        "fixed top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ease-in-out",
+        isShrunk ? "h-[var(--header-height)]" : "h-24",
+        isShrunk ? "shrink" : ""
+      )}
+    >
+      <div className="container flex h-full max-w-screen-2xl items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 header-title-logo">
           <svg
-            width="40"
-            height="40"
+            width="60"
+            height="60"
             viewBox="0 0 200 200"
             xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8"
+            className="h-14 w-14"
           >
             <path
-              fill="hsl(180.2,40.1%,45.3%)"
+              fill="hsl(180, 40%, 45%)"
               d="M100 0C72.386 0 50 22.386 50 50c0 14.897 6.503 28.23 16.965 37.125L62.5 87.5h75l-4.465-.375C143.497 78.23 150 64.897 150 50 150 22.386 127.614 0 100 0zm0 25c13.807 0 25 11.193 25 25s-11.193 25-25 25-25-11.193-25-25 11.193-25 25-25z"
             />
             <path
-              fill="hsl(180.2,40.1%,45.3%)"
-              stroke="hsl(26.1,40%,44.9%)"
+              fill="hsl(180, 40%, 45%)"
+              stroke="hsl(26, 40%, 45%)"
               strokeWidth="10"
               d="M30 87.5V180a5 5 0 005 5h130a5 5 0 005-5V87.5H30z"
             />
             <path
               fill="none"
-              stroke="hsl(26.1,40%,44.9%)"
+              stroke="hsl(26, 40%, 45%)"
               strokeWidth="10"
               strokeLinejoin="round"
               d="M45 102.5h110v65H45z"
             />
             <path
-              fill="hsl(26.1,40%,44.9%)"
+              fill="hsl(26, 40%, 45%)"
               d="M80 167.5a10 10 0 10-20 0 10 10 0 0020 0zM100 167.5a10 10 0 10-20 0 10 10 0 0020 0zM120 167.5a10 10 0 10-20 0 10 10 0 0020 0zM140 167.5a10 10 0 10-20 0 10 10 0 0020 0z"
             />
             <path
-              fill="hsl(26.1,40%,44.9%)"
+              fill="hsl(26, 40%, 45%)"
               d="M70 125a5 5 0 10-10 0 5 5 0 0010 0zM90 125a5 5 0 10-10 0 5 5 0 0010 0zM110 125a5 5 0 10-10 0 5 5 0 0010 0zM130 125a5 5 0 10-10 0 5 5 0 0010 0zM150 125a5 5 0 10-10 0 5 5 0 0010 0z"
             />
             <path
-              fill="hsl(26.1,40%,44.9%)"
+              fill="hsl(26, 40%, 45%)"
               d="M70 145a5 5 0 10-10 0 5 5 0 0010 0zM90 145a5 5 0 10-10 0 5 5 0 0010 0zM110 145a5 5 0 10-10 0 5 5 0 0010 0zM130 145a5 5 0 10-10 0 5 5 0 0010 0zM150 145a5 5 0 10-10 0 5 5 0 0010 0z"
             />
             <path
               fill="none"
-              stroke="hsl(26.1,40%,44.9%)"
+              stroke="hsl(26, 40%, 45%)"
               strokeWidth="10"
               d="M100 102.5c-20 0-20 20-20 20s0-20 20-20z"
               transform="rotate(180 100 122.5)"
             />
             <path
-              fill="hsl(26.1,40%,44.9%)"
+              fill="hsl(26, 40%, 45%)"
               d="M30 190h140v10H30z"
             >
             </path>
-            <path d="M40 185 L40 195 M55 185 L55 195 M70 185 L70 195 M85 185 L85 195 M100 185 L100 195 M115 185 L115 195 M130 185 L130 195 M145 185 L145 195 M160 185 L160 195" stroke="hsl(26.1,40%,44.9%)" strokeWidth="4"/>
+            <path d="M40 185 L40 195 M55 185 L55 195 M70 185 L70 195 M85 185 L85 195 M100 185 L100 195 M115 185 L115 195 M130 185 L130 195 M145 185 L145 195 M160 185 L160 195" stroke="hsl(26, 40%, 45%)" strokeWidth="4"/>
           </svg>
           <span className="font-headline text-xl font-bold tracking-tight">
-            Salaat Spotter
+            MyMasjid
           </span>
         </Link>
         
