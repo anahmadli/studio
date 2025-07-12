@@ -33,7 +33,7 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --header-height: 6rem;
+    --header-height: 5rem;
   }
   .dark {
     --background: 215 30% 15%;
@@ -81,12 +81,12 @@ body {
     padding-bottom: 20px!important;
   }
   .header-title-logo svg {
-    height: 40px;
-    width: 40px;
+    height: 35px;
+    width: 35px;
   }
 }
 
 #header.shrink .header-display-mobile .header-title-logo svg {
-    height: 33px !important;
-    width: 33px !important;
+    height: 30px !important;
+    width: 30px !important;
 }

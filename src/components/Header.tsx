@@ -93,11 +93,11 @@ export default function Header() {
       <div className="container flex h-full max-w-screen-2xl items-center justify-between">
         <Link href="/" className="flex items-center gap-2 header-title-logo">
           <svg
-            width="60"
-            height="60"
+            width="50"
+            height="50"
             viewBox="0 0 200 200"
             xmlns="http://www.w3.org/2000/svg"
-            className="h-14 w-14"
+            className="h-12 w-12"
           >
             <path
               fill="hsl(180, 40%, 45%)"
