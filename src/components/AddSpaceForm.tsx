@@ -49,6 +49,8 @@ export default function AddSpaceForm() {
       name: '',
       capacity: 1,
       availableHours: '',
+      latitude: 0,
+      longitude: 0,
       amenities: [],
       notes: '',
     },
