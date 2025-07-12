@@ -148,9 +148,9 @@ export default function PrayerTimes({ filters, setFilters, position, loadingLoca
               {suggestedMethods.length > 0 ? (
                 <>
                   <p className="p-2 text-xs font-semibold text-muted-foreground">AI Suggestions</p>
-                  {suggestedMethods.map((method) => {
+                  {suggestedMethods.map((method, index) => {
                     const methodId = getPrayerMethodId(method);
-                    return methodId !== undefined ? <SelectItem key={methodId} value={String(methodId)}>{method}</SelectItem> : null
+                    return methodId !== undefined ? <SelectItem key={`${methodId}-${index}`} value={String(methodId)}>{method}</SelectItem> : null
                   })}
                   <Separator className="my-2" />
                   <p className="p-2 text-xs font-semibold text-muted-foreground">All Methods</p>
