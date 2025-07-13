@@ -16,10 +16,12 @@ export default function SidebarToggle({ isOpen, setIsOpen }: SidebarToggleProps)
     <Button
       onClick={() => setIsOpen(!isOpen)}
       className={cn(
-        "absolute top-1/2 -right-4 z-10 h-8 w-8 rounded-full p-0",
+        "absolute top-1/2 z-10 h-8 w-8 rounded-full p-0",
         "transform -translate-y-1/2",
-        "bg-background hover:bg-muted border-2 border-border"
+        "bg-background hover:bg-muted border-2 border-border",
+        isOpen ? "-right-4" : "-right-4"
       )}
+      style={{ right: isOpen ? '-0.5rem' : '-2.5rem' }}
       size="icon"
       aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
     >
