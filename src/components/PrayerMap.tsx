@@ -4,10 +4,10 @@
 import React from 'react';
 import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow } from '@vis.gl/react-google-maps';
 import { Skeleton } from './ui/skeleton';
-import { type PrayerSpace, type Filters } from '@/lib/types';
+import { type PrayerSpace, type Filters, type GeolocationPosition } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Home, Users } from 'lucide-react';
+import { Home, Users, User } from 'lucide-react';
 
 const MasjidIcon = () => (
   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md border-2 border-white">
@@ -19,6 +19,12 @@ const HomeIcon = () => (
   <div className="w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-md border-2 border-white">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
   </div>
+);
+
+const UserLocationMarker = () => (
+    <div className="w-5 h-5">
+        <div className="w-full h-full rounded-full bg-blue-500 border-2 border-white shadow-md animate-pulse" />
+    </div>
 );
 
 
@@ -46,9 +52,11 @@ const mapStyles = [
 
 interface PrayerMapProps {
   filters: Filters;
+  userLocation: GeolocationPosition | null;
+  error: string | null;
 }
 
-export default function PrayerMap({ filters }: PrayerMapProps) {
+export default function PrayerMap({ filters, userLocation, error }: PrayerMapProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [selectedSpace, setSelectedSpace] = React.useState<PrayerSpace | null>(null);
 
@@ -64,6 +72,7 @@ export default function PrayerMap({ filters }: PrayerMapProps) {
   }
   
   const defaultCenter = { lat: 39.1434, lng: -77.2014 };
+  const center = userLocation ? userLocation : defaultCenter;
 
   const filteredSpaces = mockPrayerSpaces.filter(space => {
     // Type filters
@@ -85,9 +94,13 @@ export default function PrayerMap({ filters }: PrayerMapProps) {
 
   return (
     <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API loaded.')}>
+      {error && (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 bg-destructive/90 text-destructive-foreground p-2 rounded-md text-sm">
+          {error}
+        </div>
+      )}
       <Map
-        defaultCenter={defaultCenter}
-        center={defaultCenter}
+        center={center}
         defaultZoom={12}
         gestureHandling={'greedy'}
         disableDefaultUI={true}
@@ -95,6 +108,12 @@ export default function PrayerMap({ filters }: PrayerMapProps) {
         styles={mapStyles}
         className="h-full w-full"
       >
+        {userLocation && (
+          <AdvancedMarker position={userLocation} title="Your location">
+              <UserLocationMarker />
+          </AdvancedMarker>
+        )}
+        
         {filteredSpaces.map((space) => (
           <AdvancedMarker 
             key={space.id} 

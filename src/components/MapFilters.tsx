@@ -9,23 +9,24 @@ import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { getPrayerMethodId, prayerMethodMap } from '@/lib/prayer-methods';
-import type { Filters } from '@/lib/types';
+import type { Filters, GeolocationPosition } from '@/lib/types';
 import { Compass, Filter, Droplets, User, ParkingCircle, Accessibility, CalendarCheck } from 'lucide-react';
 
 interface MapFiltersProps {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  userLocation: GeolocationPosition | null;
 }
 
-export default function MapFilters({ filters, setFilters }: MapFiltersProps) {
+export default function MapFilters({ filters, setFilters, userLocation }: MapFiltersProps) {
   const [suggestedMethods, setSuggestedMethods] = useState<string[]>([]);
   const [selectedMethod, setSelectedMethod] = useState<number>(2); // Default to ISNA
   const { toast } = useToast();
 
   useEffect(() => {
-    // This effect runs once to get AI suggestions for prayer methods.
-    // In a real app, this might be tied to user location.
-    suggestPrayerTimes({ latitude: 39.1434, longitude: -77.2014 }) // Default to Gaithersburg
+    if (!userLocation) return;
+    
+    suggestPrayerTimes({ latitude: userLocation.lat, longitude: userLocation.lng })
       .then(response => {
         if (response?.suggestedMethods) {
           setSuggestedMethods(response.suggestedMethods);
@@ -39,7 +40,7 @@ export default function MapFilters({ filters, setFilters }: MapFiltersProps) {
           description: "Could not get suggestions for prayer time calculations.",
         });
       });
-  }, [toast]);
+  }, [userLocation, toast]);
 
   const handleMethodChange = (value: string) => {
     setSelectedMethod(Number(value));
