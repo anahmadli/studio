@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -18,8 +19,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from './ui/card';
-import { MapPin, Loader2, FileText, ShieldCheck } from 'lucide-react';
+import { MapPin, Loader2, FileText, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react';
 
 const amenitiesList = [
   { id: 'wudu', label: 'Wudu Area (Ablution)' },
@@ -41,8 +43,11 @@ const formSchema = z.object({
   consent: z.boolean().refine(val => val === true, { message: "You must agree to the terms to proceed." }),
 });
 
+type Tab = "details" | "consent" | "background";
+
 export default function AddSpaceForm() {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<Tab>("details");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -69,6 +74,7 @@ export default function AddSpaceForm() {
       description: 'Your prayer space has been successfully added to the map.',
     });
     form.reset();
+    setActiveTab("details");
   }
 
   return (
@@ -76,7 +82,7 @@ export default function AddSpaceForm() {
       <CardContent className="p-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Tabs defaultValue="details" className="w-full">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as Tab)} className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="details">Masjid Details</TabsTrigger>
                 <TabsTrigger value="consent">Consent Form</TabsTrigger>
@@ -258,6 +264,11 @@ export default function AddSpaceForm() {
                     )}
                   />
                 </div>
+                <div className="mt-8 flex justify-end">
+                  <Button type="button" onClick={() => setActiveTab("consent")}>
+                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
               </TabsContent>
               <TabsContent value="consent" className="p-6">
                 <div className="space-y-6">
@@ -297,6 +308,11 @@ export default function AddSpaceForm() {
                       )}
                     />
                 </div>
+                 <div className="mt-8 flex justify-end">
+                  <Button type="button" onClick={() => setActiveTab("background")}>
+                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
               </TabsContent>
               <TabsContent value="background" className="p-6">
                 <div className="space-y-6">
@@ -316,15 +332,15 @@ export default function AddSpaceForm() {
                     Initiate Background Check (via Third-Party)
                   </Button>
                 </div>
+                <div className="p-6 border-t mt-6">
+                  <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+                    ) : "Register My Space"}
+                  </Button>
+                </div>
               </TabsContent>
             </Tabs>
-            <div className="p-6 border-t">
-              <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
-                ) : "Register My Space"}
-              </Button>
-            </div>
           </form>
         </Form>
       </CardContent>
