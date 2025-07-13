@@ -163,7 +163,7 @@ export default function Header() {
           <Button asChild variant="outline" className="hidden sm:flex">
             <Link href="/add-space">
               <PlusCircle className="mr-2 h-4 w-4" />
-              Add a Space
+              Register a Masjid
             </Link>
           </Button>
           {isLoggedIn ? (
