@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -30,6 +31,18 @@ const mockPrayerSpaces: PrayerSpace[] = [
   { id: 'm3', type: 'masjid', name: 'Muslim Community Center', position: { lat: 39.1162, lng: -77.0135 }, amenities: ['Wudu', 'Parking'] },
   { id: 'h3', type: 'home', name: 'Yusuf\'s Garage Musalla', position: { lat: 39.1422, lng: -77.2352 }, capacity: 12, hours: 'Jummah Only', amenities: ['Parking'] },
 ];
+
+const mapStyles = [
+  {
+    featureType: "poi.business",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "poi.attraction",
+    stylers: [{ visibility: "off" }],
+  },
+];
+
 
 interface PrayerMapProps {
   filters: Filters;
@@ -84,7 +97,8 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
         defaultZoom={12}
         gestureHandling={'greedy'}
         disableDefaultUI={true}
-        mapId="salaat_spotter_map"
+        mapId="my_masjid_map"
+        styles={mapStyles}
         className="h-full w-full"
       >
         {filteredSpaces.map((space) => (
