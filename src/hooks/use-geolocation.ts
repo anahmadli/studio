@@ -22,6 +22,7 @@ export function useGeolocation() {
 
     const onError = (err: GeolocationPositionError) => {
       setError(`Location Error: ${err.message}. Showing default location.`);
+      setPosition(null); // Ensure position is cleared on error
       setLoading(false);
     };
 
