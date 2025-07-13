@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -11,6 +12,8 @@ import { Switch } from '@/components/ui/switch';
 import { getPrayerMethodId, prayerMethodMap } from '@/lib/prayer-methods';
 import type { Filters, GeolocationPosition } from '@/lib/types';
 import { Compass, Filter, Droplets, User, ParkingCircle, Accessibility, CalendarCheck } from 'lucide-react';
+import { getPrayerTimes } from '@/lib/prayer-times';
+import { usePrayerTimes as usePrayerTimesStore } from '@/hooks/use-prayer-times-store';
 
 interface MapFiltersProps {
   filters: Filters;
@@ -22,25 +25,53 @@ export default function MapFilters({ filters, setFilters, userLocation }: MapFil
   const [suggestedMethods, setSuggestedMethods] = useState<string[]>([]);
   const [selectedMethod, setSelectedMethod] = useState<number>(2); // Default to ISNA
   const { toast } = useToast();
+  const { setPrayerTimes, setIsLoading } = usePrayerTimesStore();
 
   useEffect(() => {
     if (!userLocation) return;
-    
-    suggestPrayerTimes({ latitude: userLocation.lat, longitude: userLocation.lng })
-      .then(response => {
+
+    const fetchSuggestions = async () => {
+      try {
+        const response = await suggestPrayerTimes({ latitude: userLocation.lat, longitude: userLocation.lng });
         if (response?.suggestedMethods) {
           setSuggestedMethods(response.suggestedMethods);
         }
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("Error fetching prayer time suggestions:", err);
         toast({
           variant: "destructive",
           title: "AI Suggestion Error",
           description: "Could not get suggestions for prayer time calculations.",
         });
-      });
+      }
+    };
+
+    fetchSuggestions();
   }, [userLocation, toast]);
+
+  useEffect(() => {
+    if (!userLocation) return;
+
+    const fetchPrayerTimes = async () => {
+      setIsLoading(true);
+      try {
+        const times = await getPrayerTimes(userLocation.lat, userLocation.lng, selectedMethod);
+        setPrayerTimes(times);
+      } catch (err) {
+        console.error("Error fetching prayer times:", err);
+        toast({
+          variant: "destructive",
+          title: "Prayer Times Error",
+          description: "Could not fetch prayer times for your location.",
+        });
+        setPrayerTimes(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPrayerTimes();
+  }, [userLocation, selectedMethod, setPrayerTimes, setIsLoading, toast]);
 
   const handleMethodChange = (value: string) => {
     setSelectedMethod(Number(value));

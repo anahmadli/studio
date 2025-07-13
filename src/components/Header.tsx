@@ -13,12 +13,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, LogOut, PlusCircle, User } from 'lucide-react';
+import { LayoutDashboard, LogOut, PlusCircle, User, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePrayerTimes } from '@/hooks/use-prayer-times-store';
+import { useNextPrayer } from '@/hooks/use-next-prayer';
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isShrunk, setIsShrunk] = useState(false);
+  const { prayerTimes } = usePrayerTimes();
+  const { nextPrayer, timeToNextPrayer } = useNextPrayer(prayerTimes);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -27,6 +31,13 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
+  const formatTime = (totalSeconds: number) => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
   
   return (
     <header 
@@ -95,6 +106,17 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-4">
+          {nextPrayer && timeToNextPrayer !== null && (
+            <div className="hidden md:flex items-center gap-3 text-sm font-semibold bg-primary/10 text-primary rounded-full px-4 py-2 border border-primary/20">
+              <Clock className="h-5 w-5" />
+              <div>
+                <span className="font-bold">{nextPrayer}</span> in
+              </div>
+              <div className="font-mono text-base font-bold tracking-wider">
+                {formatTime(timeToNextPrayer)}
+              </div>
+            </div>
+          )}
           <Button asChild variant="outline" className="hidden sm:flex">
             <Link href="/add-space">
               <PlusCircle className="mr-2 h-4 w-4" />
