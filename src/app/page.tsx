@@ -6,6 +6,8 @@ import MapFilters from '@/components/MapFilters';
 import type { Filters, GeolocationPosition } from '@/lib/types';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import SidebarToggle from '@/components/SidebarToggle';
 
 export default function Home() {
   const [filters, setFilters] = useState<Filters>({
@@ -19,14 +21,27 @@ export default function Home() {
   });
   
   const { position, error, loading } = useGeolocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[380px_1fr] h-[calc(100vh-var(--header-height))]">
-      <aside className="border-r border-border bg-card/50 p-4 overflow-y-auto">
-        <MapFilters 
-          filters={filters} 
-          setFilters={setFilters} 
-          userLocation={position}
+    <div 
+      className={cn(
+        "grid grid-cols-1 transition-all duration-300 ease-in-out",
+        isSidebarOpen ? "md:grid-cols-[380px_1fr]" : "md:grid-cols-[0px_1fr]",
+        "h-[calc(100vh-var(--header-height))]"
+      )}
+    >
+      <aside className="relative border-r border-border bg-card/50 overflow-hidden">
+        <div className="p-4 overflow-y-auto h-full w-[380px]">
+          <MapFilters 
+            filters={filters} 
+            setFilters={setFilters} 
+            userLocation={position}
+          />
+        </div>
+        <SidebarToggle 
+          isOpen={isSidebarOpen} 
+          setIsOpen={setIsSidebarOpen} 
         />
       </aside>
       <div className="h-full w-full">
