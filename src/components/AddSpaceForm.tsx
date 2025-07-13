@@ -23,6 +23,8 @@ import { MapPin, Loader2, FileText, ShieldCheck, ArrowRight, User, Calendar, Key
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useState } from 'react';
 import { initiateBackgroundCheck } from '@/ai/flows/initiate-background-check';
+import type { BackgroundCheckInput } from '@/lib/types';
+
 
 const amenitiesList = [
   { id: 'wudu', label: 'Wudu Area (Ablution)' },
@@ -88,7 +90,7 @@ export default function AddSpaceForm() {
     setIsChecking(true);
     setCheckResult(null);
 
-    const backgroundCheckData = {
+    const backgroundCheckData: BackgroundCheckInput = {
       firstName: form.getValues('firstName'),
       middleName: form.getValues('middleName'),
       lastName: form.getValues('lastName'),
@@ -101,7 +103,7 @@ export default function AddSpaceForm() {
     }
 
     // Trigger validation for background check fields
-    const isValid = await form.trigger(['firstName', 'lastName', 'dob', 'ssn']);
+    const isValid = await form.trigger(['firstName', 'lastName', 'dob', 'ssn', 'street', 'city', 'state', 'zip']);
     if (!isValid) {
         setIsChecking(false);
         toast({
