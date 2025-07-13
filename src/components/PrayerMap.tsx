@@ -112,11 +112,11 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
           </AdvancedMarker>
         ))}
 
-        {userPosition && (
+        {/* {userPosition && (
           <AdvancedMarker position={userPosition} title="Your Location">
             <Pin background={'#45A0A2'} borderColor={'#fff'} glyphColor={'#fff'} />
           </AdvancedMarker>
-        )}
+        )} */}
 
         {selectedSpace && (
           <InfoWindow 
