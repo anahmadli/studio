@@ -19,9 +19,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from './ui/card';
-import { MapPin, Loader2, FileText, ShieldCheck, ArrowRight } from 'lucide-react';
+import { MapPin, Loader2, FileText, ShieldCheck, ArrowRight, User, Calendar, KeyRound } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useState } from 'react';
+import { initiateBackgroundCheck } from '@/ai/flows/initiate-background-check';
 
 const amenitiesList = [
   { id: 'wudu', label: 'Wudu Area (Ablution)' },
@@ -31,6 +32,7 @@ const amenitiesList = [
 ];
 
 const formSchema = z.object({
+  // Masjid Details
   name: z.string().min(3, 'Space name must be at least 3 characters.'),
   capacity: z.coerce.number().min(1, 'Capacity must be at least 1.'),
   availableHours: z.string().min(3, 'Please specify available hours.'),
@@ -40,7 +42,16 @@ const formSchema = z.object({
   zip: z.string().min(5, 'Please enter a valid zip code.'),
   amenities: z.array(z.string()).optional(),
   notes: z.string().optional(),
+  
+  // Consent
   consent: z.boolean().refine(val => val === true, { message: "You must agree to the terms to proceed." }),
+
+  // Background Check
+  firstName: z.string().min(1, 'First name is required.'),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, 'Last name is required.'),
+  dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please use YYYY-MM-DD format."),
+  ssn: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, "Please use XXX-XX-XXXX format."),
 });
 
 type Tab = "details" | "consent" | "background";
@@ -48,6 +59,9 @@ type Tab = "details" | "consent" | "background";
 export default function AddSpaceForm() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<Tab>("details");
+  const [isChecking, setIsChecking] = useState(false);
+  const [checkResult, setCheckResult] = useState<{success: boolean, message: string} | null>(null);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,8 +76,63 @@ export default function AddSpaceForm() {
       amenities: [],
       notes: '',
       consent: false,
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      dob: '',
+      ssn: ''
     },
   });
+
+  async function handleBackgroundCheck() {
+    setIsChecking(true);
+    setCheckResult(null);
+
+    const backgroundCheckData = {
+      firstName: form.getValues('firstName'),
+      middleName: form.getValues('middleName'),
+      lastName: form.getValues('lastName'),
+      dob: form.getValues('dob'),
+      ssn: form.getValues('ssn'),
+      address: form.getValues('street'),
+      city: form.getValues('city'),
+      state: form.getValues('state'),
+      zip: form.getValues('zip'),
+    }
+
+    // Trigger validation for background check fields
+    const isValid = await form.trigger(['firstName', 'lastName', 'dob', 'ssn']);
+    if (!isValid) {
+        setIsChecking(false);
+        toast({
+            variant: "destructive",
+            title: 'Validation Error',
+            description: 'Please fill out all required background check fields correctly.',
+        });
+        return;
+    }
+    
+    try {
+      const result = await initiateBackgroundCheck(backgroundCheckData);
+      setCheckResult(result);
+      toast({
+        title: result.success ? 'Check Initiated' : 'Error',
+        description: result.message,
+        variant: result.success ? 'default' : 'destructive',
+      });
+    } catch (error) {
+      const result = { success: false, message: 'An unexpected client-side error occurred.' };
+      setCheckResult(result);
+      toast({
+        title: 'Error',
+        description: result.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsChecking(false);
+    }
+  }
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -75,6 +144,7 @@ export default function AddSpaceForm() {
     });
     form.reset();
     setActiveTab("details");
+    setCheckResult(null);
   }
 
   return (
@@ -141,7 +211,7 @@ export default function AddSpaceForm() {
                         Address
                       </FormLabel>
                       <FormDescription>
-                        The address of the prayer space.
+                        The address of the prayer space. This will also be used for the background check.
                       </FormDescription>
                     </div>
                     <div className="space-y-4">
@@ -285,6 +355,7 @@ export default function AddSpaceForm() {
                       <li>You understand that this information will be visible to other users of the application for the purpose of finding a prayer space.</li>
                       <li>You confirm that you have the authority to offer this space for prayer and are responsible for the safety and security of your property and any visitors.</li>
                       <li>MyMasjid is a platform for connecting individuals and is not responsible for any incidents, damages, or liabilities that may occur.</li>
+                       <li>You consent to a background check as described in the next step.</li>
                     </ul>
                   </div>
                    <FormField
@@ -308,7 +379,10 @@ export default function AddSpaceForm() {
                       )}
                     />
                 </div>
-                 <div className="mt-8 flex justify-end">
+                 <div className="mt-8 flex justify-between">
+                  <Button type="button" variant="outline" onClick={() => setActiveTab("details")}>
+                     <ArrowRight className="mr-2 h-4 w-4 transform rotate-180" /> Previous
+                  </Button>
                   <Button type="button" onClick={() => setActiveTab("background")}>
                     Next <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -320,20 +394,86 @@ export default function AddSpaceForm() {
                     <ShieldCheck className="h-8 w-8 text-primary" />
                     <h3 className="text-xl font-semibold">Safety & Background Check</h3>
                   </div>
-                   <div className="space-y-4 text-sm text-muted-foreground">
+                   <div className="space-y-2 text-sm text-muted-foreground">
                     <p>
-                      For the safety and security of our community, all individuals who wish to list their home as a prayer space may be required to undergo a background check.
+                      For community safety, we require a background check. Please provide your legal information below. This is sent securely to our third-party verification service.
                     </p>
-                    <p>
-                      This process is handled by a trusted third-party service and helps ensure a safe environment for everyone. Click the button below to learn more and begin the process. Your space will not be listed until the check is complete and approved.
-                    </p>
+                     <p className="font-semibold text-destructive/80">Your address from the previous tab will be used for this check.</p>
                   </div>
-                  <Button type="button" variant="outline" size="lg" className="w-full">
-                    Initiate Background Check (via Third-Party)
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem className="md:col-span-1">
+                              <FormLabel className="flex items-center gap-2"><User className="h-4 w-4"/>First Name</FormLabel>
+                              <FormControl><Input placeholder="John" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="middleName"
+                          render={({ field }) => (
+                            <FormItem className="md:col-span-1">
+                              <FormLabel>Middle Name</FormLabel>
+                              <FormControl><Input placeholder="M." {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem className="md:col-span-1">
+                              <FormLabel>Last Name</FormLabel>
+                              <FormControl><Input placeholder="Doe" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <FormField
+                        control={form.control}
+                        name="dob"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2"><Calendar className="h-4 w-4"/>Date of Birth</FormLabel>
+                            <FormControl><Input placeholder="YYYY-MM-DD" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                       <FormField
+                        control={form.control}
+                        name="ssn"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2"><KeyRound className="h-4 w-4"/>SSN</FormLabel>
+                            <FormControl><Input placeholder="XXX-XX-XXXX" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                  </div>
+
+                  <Button type="button" variant="outline" size="lg" className="w-full" onClick={handleBackgroundCheck} disabled={isChecking}>
+                     {isChecking ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Checking...</>
+                    ) : "Initiate Background Check"}
                   </Button>
+                   {checkResult && (
+                      <div className={`text-center p-2 rounded-md text-sm ${checkResult.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {checkResult.message}
+                      </div>
+                  )}
                 </div>
                 <div className="p-6 border-t mt-6">
-                  <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={form.formState.isSubmitting}>
+                  <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={form.formState.isSubmitting || !checkResult?.success}>
                     {form.formState.isSubmitting ? (
                       <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
                     ) : "Register My Space"}
