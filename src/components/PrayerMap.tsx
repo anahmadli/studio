@@ -7,7 +7,8 @@ import { Skeleton } from './ui/skeleton';
 import { type PrayerSpace, type Filters, type GeolocationPosition } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Home, Users } from 'lucide-react';
+import { Home, Users, Route } from 'lucide-react';
+import { getDistance } from '@/lib/utils';
 
 const MasjidIcon = () => (
   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md border-2 border-white">
@@ -140,6 +141,14 @@ export default function PrayerMap({ filters, userLocation, error }: PrayerMapPro
                   {selectedSpace.type === 'masjid' ? <MasjidIcon /> : <HomeIcon />}
                   {selectedSpace.name}
                 </CardTitle>
+                {userLocation && (
+                  <div className="flex items-center text-sm text-muted-foreground gap-2 pt-1">
+                    <Route className="h-4 w-4" />
+                    <span>
+                      {getDistance(userLocation, selectedSpace.position).toFixed(1)} miles away
+                    </span>
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="p-2 space-y-2">
                 {selectedSpace.type === 'home' && (
