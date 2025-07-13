@@ -24,7 +24,7 @@ export default function SidebarToggle({ isOpen, setIsOpen, className }: SidebarT
       size="icon"
       aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
     >
-      {isOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+      {isOpen ? <ChevronLeft className="h-4 w-4 text-foreground" /> : <ChevronRight className="h-4 w-4 text-foreground" />}
     </Button>
   );
 }
