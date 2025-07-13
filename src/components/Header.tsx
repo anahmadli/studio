@@ -142,7 +142,7 @@ export default function Header() {
             </path>
             <path d="M40 185 L40 195 M55 185 L55 195 M70 185 L70 195 M85 185 L85 195 M100 185 L100 195 M115 185 L115 195 M130 185 L130 195 M145 185 L145 195 M160 185 L160 195" stroke="hsl(26, 40%, 45%)" strokeWidth="4"/>
           </svg>
-          <span className="font-headline text-2xl font-bold tracking-tight">
+          <span className="font-decorative text-3xl font-bold tracking-tight">
             MyMasjid
           </span>
         </Link>

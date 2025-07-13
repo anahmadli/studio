@@ -53,7 +53,7 @@ export default function MapFilters({ filters, setFilters }: MapFiltersProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-headline">
+          <CardTitle className="font-decorative flex items-center gap-2">
             <Filter className="h-5 w-5" />
             Map Filters
           </CardTitle>
@@ -115,7 +115,7 @@ export default function MapFilters({ filters, setFilters }: MapFiltersProps) {
       
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-headline">
+          <CardTitle className="font-decorative flex items-center gap-2">
             <Compass className="h-5 w-5" />
             Calculation Method
           </CardTitle>
