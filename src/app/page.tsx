@@ -20,18 +20,16 @@ export default function Home() {
   const { position, loading: loadingLocation } = useGeolocation();
 
   return (
-    <div className="flex flex-col h-[calc(100vh-var(--header-height))]">
-      <div className="flex-grow grid grid-cols-1 md:grid-cols-[380px_1fr]">
-        <aside className="border-r border-border bg-card/50 p-4 overflow-y-auto">
-          <MapFilters filters={filters} setFilters={setFilters} />
-        </aside>
-        <main className="h-full w-full">
-          <PrayerMap
-            filters={filters}
-            userPosition={position}
-            loadingLocation={loadingLocation}
-          />
-        </main>
+    <div className="grid grid-cols-1 md:grid-cols-[380px_1fr] h-[calc(100vh-var(--header-height))]">
+      <aside className="border-r border-border bg-card/50 p-4 overflow-y-auto">
+        <MapFilters filters={filters} setFilters={setFilters} />
+      </aside>
+      <div className="h-full w-full">
+        <PrayerMap
+          filters={filters}
+          userPosition={position}
+          loadingLocation={loadingLocation}
+        />
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
         <div className="relative flex min-h-screen flex-col">
           <Header />
-          <div className="flex-1 pt-[var(--header-height)]">{children}</div>
+          <main className="flex-1">{children}</main>
         </div>
         <Toaster />
       </body>
