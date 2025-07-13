@@ -7,7 +7,7 @@ import { Skeleton } from './ui/skeleton';
 import { type PrayerSpace, type Filters, type GeolocationPosition } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Home, Users, User } from 'lucide-react';
+import { Home, Users } from 'lucide-react';
 
 const MasjidIcon = () => (
   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md border-2 border-white">
@@ -22,8 +22,11 @@ const HomeIcon = () => (
 );
 
 const UserLocationMarker = () => (
-    <div className="w-5 h-5">
-        <div className="w-full h-full rounded-full bg-blue-500 border-2 border-white shadow-md animate-pulse" />
+    <div className="flex flex-col items-center" style={{transform: 'translateY(-50%)'}}>
+        <div className="bg-white px-2 py-0.5 rounded-md shadow-md text-xs font-semibold mb-1">You</div>
+        <div className="w-4 h-4">
+            <div className="w-full h-full rounded-full bg-blue-500 border-2 border-white shadow-md animate-pulse" />
+        </div>
     </div>
 );
 
