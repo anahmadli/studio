@@ -7,7 +7,7 @@ import { Skeleton } from './ui/skeleton';
 import { type PrayerSpace, type Filters, type GeolocationPosition } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Home, Users, Route } from 'lucide-react';
+import { Home, Users, Route, MapPin } from 'lucide-react';
 import { getDistance } from '@/lib/utils';
 
 const MasjidIcon = () => (
@@ -34,12 +34,12 @@ const UserLocationMarker = () => (
 
 // Mock data - in a real app, this would come from Firestore
 const mockPrayerSpaces: PrayerSpace[] = [
-  { id: 'm1', type: 'masjid', name: 'Islamic Center of Maryland', position: { lat: 39.1376, lng: -77.1511 }, amenities: ['Wudu', 'Parking', 'Wheelchair Accessible', 'Sisters Area'] },
-  { id: 'm2', type: 'masjid', name: 'Islamic Community Center of Potomac', position: { lat: 39.0911, lng: -77.2458 }, amenities: ['Wudu', 'Parking'] },
-  { id: 'h1', type: 'home', name: 'Ahmed\'s Prayer Space', position: { lat: 39.1550, lng: -77.2050 }, capacity: 8, hours: 'Dhuhr & Asr', amenities: ['Wudu'] },
-  { id: 'h2', type: 'home', name: 'Khadija\'s Guest Room', position: { lat: 39.1280, lng: -77.1800 }, capacity: 4, hours: 'All day', amenities: ['Wudu', 'Sisters Area'] },
-  { id: 'm3', type: 'masjid', name: 'Muslim Community Center', position: { lat: 39.1162, lng: -77.0135 }, amenities: ['Wudu', 'Parking'] },
-  { id: 'h3', type: 'home', name: 'Yusuf\'s Garage Musalla', position: { lat: 39.1422, lng: -77.2352 }, capacity: 12, hours: 'Jummah Only', amenities: ['Parking'] },
+  { id: 'm1', type: 'masjid', name: 'Islamic Center of Maryland', position: { lat: 39.1376, lng: -77.1511 }, amenities: ['Wudu', 'Parking', 'Wheelchair Accessible', 'Sisters Area'], address: '19411 Woodfield Rd, Gaithersburg, MD 20879' },
+  { id: 'm2', type: 'masjid', name: 'Islamic Community Center of Potomac', position: { lat: 39.0911, lng: -77.2458 }, amenities: ['Wudu', 'Parking'], address: '10601 River Rd, Potomac, MD 20854' },
+  { id: 'h1', type: 'home', name: 'Ahmed\'s Prayer Space', position: { lat: 39.1550, lng: -77.2050 }, capacity: 8, hours: 'Dhuhr & Asr', amenities: ['Wudu'], address: '123 Main St, Gaithersburg, MD' },
+  { id: 'h2', type: 'home', name: 'Khadija\'s Guest Room', position: { lat: 39.1280, lng: -77.1800 }, capacity: 4, hours: 'All day', amenities: ['Wudu', 'Sisters Area'], address: '456 Oak Ave, Rockville, MD' },
+  { id: 'm3', type: 'masjid', name: 'Muslim Community Center', position: { lat: 39.1162, lng: -77.0135 }, amenities: ['Wudu', 'Parking'], address: '15200 New Hampshire Ave, Silver Spring, MD 20905' },
+  { id: 'h3', type: 'home', name: 'Yusuf\'s Garage Musalla', position: { lat: 39.1422, lng: -77.2352 }, capacity: 12, hours: 'Jummah Only', amenities: ['Parking'], address: '789 Pine Ln, Germantown, MD' },
 ];
 
 const mapStyles = [
@@ -141,7 +141,7 @@ export default function PrayerMap({ filters, userLocation, error }: PrayerMapPro
                   {selectedSpace.type === 'masjid' ? <MasjidIcon /> : <HomeIcon />}
                   {selectedSpace.name}
                 </CardTitle>
-                {userLocation && (
+                 {userLocation && (
                   <div className="flex items-center text-sm text-muted-foreground gap-2 pt-1">
                     <Route className="h-4 w-4" />
                     <span>
@@ -151,6 +151,12 @@ export default function PrayerMap({ filters, userLocation, error }: PrayerMapPro
                 )}
               </CardHeader>
               <CardContent className="p-2 space-y-2">
+                {selectedSpace.type === 'home' && selectedSpace.address && (
+                  <div className="flex items-start text-sm text-muted-foreground gap-2">
+                    <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+                    <span>{selectedSpace.address}</span>
+                  </div>
+                )}
                 {selectedSpace.type === 'home' && (
                   <div className='flex items-center text-sm text-muted-foreground gap-4'>
                     <div className='flex items-center gap-1.5'>

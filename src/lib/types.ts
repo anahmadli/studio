@@ -10,6 +10,7 @@ export type Masjid = {
   name: string;
   position: GeolocationPosition;
   amenities: string[];
+  address?: string;
 };
 
 export type Home = {
@@ -20,6 +21,7 @@ export type Home = {
   capacity: number;
   hours: string;
   amenities: string[];
+  address?: string;
 };
 
 export type PrayerSpace = Masjid | Home;
