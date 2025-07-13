@@ -10,9 +10,14 @@ const prayerOrder: (keyof PrayerTimesData)[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib
 export function useNextPrayer(prayerTimes: PrayerTimesData | null) {
   const [nextPrayer, setNextPrayer] = useState<keyof PrayerTimesData | null>(null);
   const [timeToNextPrayer, setTimeToNextPrayer] = useState<number | null>(null);
-  
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
-    if (!prayerTimes) {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!prayerTimes || !isClient) {
       setNextPrayer(null);
       setTimeToNextPrayer(null);
       return;
@@ -24,19 +29,16 @@ export function useNextPrayer(prayerTimes: PrayerTimesData | null) {
       let nextPrayerName: keyof PrayerTimesData | null = null;
 
       for (const prayer of prayerOrder) {
-        // Al-Adhan API returns times in "HH:mm" format. We parse this for today's date.
         const prayerTimeStr = prayerTimes[prayer];
         const todayPrayerTime = parse(prayerTimeStr, 'HH:mm', new Date());
 
-        // If this prayer time is in the future, it's a candidate for the next prayer.
         if (isBefore(now, todayPrayerTime)) {
           nextPrayerTime = todayPrayerTime;
           nextPrayerName = prayer;
-          break; // Found the next prayer for today, exit the loop.
+          break;
         }
       }
 
-      // If all of today's prayers are past, the next prayer is tomorrow's Fajr.
       if (!nextPrayerName) {
         const tomorrowFajrTimeStr = prayerTimes['Fajr'];
         nextPrayerTime = addDays(parse(tomorrowFajrTimeStr, 'HH:mm', new Date()), 1);
@@ -53,14 +55,12 @@ export function useNextPrayer(prayerTimes: PrayerTimesData | null) {
       }
     };
     
-    // Calculate immediately on load
     calculateNextPrayer();
     
-    // Then, update every second
     const interval = setInterval(calculateNextPrayer, 1000);
 
     return () => clearInterval(interval);
-  }, [prayerTimes]);
+  }, [prayerTimes, isClient]);
   
-  return { nextPrayer, timeToNextPrayer };
+  return { nextPrayer, timeToNextPrayer, isClient };
 }

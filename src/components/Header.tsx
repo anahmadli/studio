@@ -22,7 +22,7 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isShrunk, setIsShrunk] = useState(false);
   const { prayerTimes } = usePrayerTimes();
-  const { nextPrayer, timeToNextPrayer } = useNextPrayer(prayerTimes);
+  const { nextPrayer, timeToNextPrayer, isClient } = useNextPrayer(prayerTimes);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -106,7 +106,7 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-4">
-          {nextPrayer && timeToNextPrayer !== null && (
+          {isClient && nextPrayer && timeToNextPrayer !== null && (
             <div className="hidden md:flex items-center gap-3 text-sm font-semibold bg-primary/10 text-primary rounded-full px-4 py-2 border border-primary/20">
               <Clock className="h-5 w-5" />
               <div>
