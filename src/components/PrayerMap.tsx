@@ -46,17 +46,11 @@ const mapStyles = [
 
 interface PrayerMapProps {
   filters: Filters;
-  userPosition: {lat: number, lng: number} | null;
-  loadingLocation: boolean;
 }
 
-export default function PrayerMap({ filters, userPosition, loadingLocation }: PrayerMapProps) {
+export default function PrayerMap({ filters }: PrayerMapProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [selectedSpace, setSelectedSpace] = React.useState<PrayerSpace | null>(null);
-
-  if (loadingLocation) {
-    return <Skeleton className="h-full w-full" />;
-  }
 
   if (!apiKey) {
     return (
@@ -93,7 +87,7 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
     <APIProvider apiKey={apiKey} onLoad={() => console.log('Maps API loaded.')}>
       <Map
         defaultCenter={defaultCenter}
-        center={userPosition || defaultCenter}
+        center={defaultCenter}
         defaultZoom={12}
         gestureHandling={'greedy'}
         disableDefaultUI={true}
@@ -111,12 +105,6 @@ export default function PrayerMap({ filters, userPosition, loadingLocation }: Pr
              {space.type === 'masjid' ? <MasjidIcon /> : <HomeIcon />}
           </AdvancedMarker>
         ))}
-
-        {userPosition && (
-          <AdvancedMarker position={userPosition} title="Your Location">
-            <Pin background={'#45A0A2'} borderColor={'#fff'} glyphColor={'#fff'} />
-          </AdvancedMarker>
-        )}
 
         {selectedSpace && (
           <InfoWindow 
